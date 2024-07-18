@@ -1,4 +1,4 @@
-package com.example.MDPhotos
+package com.example.mdphotos
 
 import org.junit.Test
 

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.MDPhotos"
+    namespace = "com.example.mdphotos"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.MDPhotos"
+        applicationId = "com.example.mdphotos"
         minSdk = 31
         targetSdk = 34
         versionCode = 1

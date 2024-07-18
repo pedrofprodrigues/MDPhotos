@@ -1,4 +1,4 @@
-package com.example.MDPhotos
+package com.example.mdphotos
 
 import android.Manifest
 import android.content.ContentValues
@@ -18,18 +18,21 @@ import androidx.camera.core.CameraSelector
 import android.util.Log
 import android.widget.Button
 import androidx.camera.core.ImageCaptureException
-import com.example.MDPhotos.databinding.ActivityMainBinding
+import com.example.mdphotos.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Vector
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var lastItems: Array<String>
+    private lateinit var sessionItems: Vector<String>
     private lateinit var btn0: Button
     private lateinit var btn1: Button
     private lateinit var btn2: Button
+    private lateinit var send: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         btn0 = viewBinding.btn0
         btn1 = viewBinding.btn1
         btn2 = viewBinding.btn2
+        send = viewBinding.send
 
         viewBinding.takePhotoBtn.setOnClickListener {
 
@@ -57,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         btn0.setOnClickListener { directory.setText(btn0.text) }
         btn1.setOnClickListener { directory.setText(btn1.text) }
         btn2.setOnClickListener { directory.setText(btn2.text) }
+        send.setOnClickListener { sendPhotos() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
@@ -73,18 +78,17 @@ class MainActivity : AppCompatActivity() {
             lastItems = numbers
             changeBtnText()
         }
-
-
     }
 
     private fun changeLastItems(lastItem: String) {
         if (lastItems.contains(lastItem)){
             return
-        }else {
+        } else {
             lastItems[2] = lastItems[1]
             lastItems[1] = lastItems[0]
             lastItems[0] = lastItem
             changeBtnText()
+            sessionItems.add(lastItem)
         }
     }
 
@@ -97,7 +101,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun takePhoto( directory: String) {
         val imageCapture = imageCapture ?: return
-
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
@@ -105,13 +108,11 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$directory")
         }
-
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 contentValues)
             .build()
-
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(this),
@@ -119,9 +120,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
-
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
+                override fun onImageSaved(output: ImageCapture.OutputFileResults){
                     val msg = "Photo capture succeeded"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
@@ -132,22 +131,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
-
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
                 }
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
             try {
                 cameraProvider.unbindAll()
-
-                imageCapture = ImageCapture.Builder().setJpegQuality(60)
-                    .build()
+                imageCapture = ImageCapture.Builder().setJpegQuality(60).build()
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
             } catch(exc: Exception) {
@@ -161,8 +155,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
+        ContextCompat.checkSelfPermission(baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onDestroy() {
@@ -174,8 +167,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
-            mutableListOf (
-                Manifest.permission.CAMERA,
+            mutableListOf (Manifest.permission.CAMERA,
             ).apply {
             }.toTypedArray()
     }
@@ -196,5 +188,17 @@ class MainActivity : AppCompatActivity() {
             } else {
                 startCamera()
             }
+
+
+
+
         }
+    private fun sendPhotos(){
+
+       /* for (sessionItem in sessionItems) {
+            var path = MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$sessionItem"
+
+        }*/
+
+    }
 }

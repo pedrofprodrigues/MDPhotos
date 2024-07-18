@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
     </androidx.camera.view.PreviewView>
 
@@ -88,5 +88,15 @@
         android:text="..."
         app:layout_constraintStart_toEndOf="@+id/btn1"
         app:layout_constraintTop_toTopOf="@+id/btn1" />
+
+    <Button
+        android:id="@+id/send"
+        android:layout_width="wrap_content"
+        android:layout_height="61dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="Send"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
