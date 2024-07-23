@@ -95,12 +95,12 @@ class MainActivity : AppCompatActivity() {
             if (inputField.visibility == View.GONE) {
                 inputField.visibility = View.VISIBLE
                 sendButton.visibility = View.VISIBLE
-                expandButton.text = "-"
+                expandButton.text = getString(R.string.collapse)
                 bg.setBackgroundColor(Color.BLACK)
             } else {
                 inputField.visibility = View.GONE
                 sendButton.visibility = View.GONE
-                expandButton.text = "+"
+                expandButton.text = getString(R.string.expand)
                 bg.setBackgroundColor(Color.TRANSPARENT)
 
             }
@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity() {
                 sendPhotos(text)
                 inputField.visibility = View.GONE
                 sendButton.visibility = View.GONE
-                expandButton.text = "+"
+                expandButton.text = getString(R.string.expand)
             } else {
                 Toast.makeText(this, "Please enter some text", Toast.LENGTH_SHORT).show()
             }

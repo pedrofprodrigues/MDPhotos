@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MDPhotos</string>
+    <string name="expand">+</string>
+    <string name="collapse">-</string>
 </resources>
