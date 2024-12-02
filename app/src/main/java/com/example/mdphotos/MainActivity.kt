@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btn1: Button
     private lateinit var btn2: Button
     private lateinit var sendButton: Button
+    private lateinit var send: Button
+
     private lateinit var expandButton: Button
     private lateinit var inputField: EditText
     private val fileList = mutableListOf<File>()
@@ -80,7 +82,7 @@ class MainActivity : AppCompatActivity() {
 
         sendButton = viewBinding.sendButton!!
         expandButton = viewBinding.expandButton!!
-        inputField = viewBinding.inputField!!
+        inputField = viewBinding.textEmailBg!!
         inputField.setText(savedText)
         viewBinding.takePhotoBtn.setOnClickListener {
             takePhoto(directory.text.toString())
