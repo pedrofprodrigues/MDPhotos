@@ -112,7 +112,8 @@
             android:backgroundTintMode="add"
             android:hint="Enter text"
             android:textColor="@color/black"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
 
         <Button
             android:id="@+id/sendButton"

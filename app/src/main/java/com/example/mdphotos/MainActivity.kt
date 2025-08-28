@@ -27,6 +27,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.camera.core.ImageCaptureException
 import androidx.core.content.FileProvider
+import androidx.core.view.isGone
 import com.example.mdphotos.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileInputStream
@@ -36,6 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import androidx.core.content.edit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -47,14 +49,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btn1: Button
     private lateinit var btn2: Button
     private lateinit var sendButton: Button
-    private lateinit var send: Button
-
     private lateinit var expandButton: Button
     private lateinit var inputField: EditText
     private val fileList = mutableListOf<File>()
     private lateinit var sharedPreferences: SharedPreferences
-    private val PREF_NAME = "MyAppPreferences"
-    private val KEY_INPUT_TEXT = "input_text"
+    private val preferredName = "MyAppPreferences"
+    private val emailInput = "input_text"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +62,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
         lastItems = Array(4) { "..." }
 
-        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(preferredName, MODE_PRIVATE)
 
-        val savedText = sharedPreferences.getString(KEY_INPUT_TEXT, "")
+        val savedText = sharedPreferences.getString(emailInput, "")
 
-        val bg = viewBinding.VLL!!
+        val bg = viewBinding.VLL
         clearAppCache(this)
 
         if (allPermissionsGranted()) {
@@ -80,9 +80,9 @@ class MainActivity : AppCompatActivity() {
         btn1 = viewBinding.btn1
         btn2 = viewBinding.btn2
 
-        sendButton = viewBinding.sendButton!!
-        expandButton = viewBinding.expandButton!!
-        inputField = viewBinding.textEmailBg!!
+        sendButton = viewBinding.sendButton
+        expandButton = viewBinding.expandButton
+        inputField = viewBinding.textEmailBg
         inputField.setText(savedText)
         viewBinding.takePhotoBtn.setOnClickListener {
             takePhoto(directory.text.toString())
@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity() {
         btn2.setOnClickListener { directory.setText(btn2.text) }
 
         expandButton.setOnClickListener {
-            if (inputField.visibility == View.GONE) {
+            if (inputField.isGone) {
                 inputField.visibility = View.VISIBLE
                 sendButton.visibility = View.VISIBLE
                 expandButton.text = getString(R.string.collapse)
@@ -277,16 +277,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val compressed_photos = File(cacheDir, "photos.zip")
-        compressed_photos.setWritable(true, false)
+        val compressedPhotos = File(cacheDir, "photos.zip")
+        compressedPhotos.setWritable(true, false)
         try {
-            if (compressed_photos.createNewFile()) {
-                println("File created: $compressed_photos")
+            if (compressedPhotos.createNewFile()) {
+                println("File created: $compressedPhotos")
             } else {
-                if (compressed_photos.delete()) {
-                    compressed_photos.createNewFile()
-                    compressed_photos.setWritable(true, false)
-                    println("File deleted and recreated: $compressed_photos")
+                if (compressedPhotos.delete()) {
+                    compressedPhotos.createNewFile()
+                    compressedPhotos.setWritable(true, false)
+                    println("File deleted and recreated: $compressedPhotos")
                 } else {
                     println("File not deleted.")
                     return
@@ -296,13 +296,12 @@ class MainActivity : AppCompatActivity() {
             println("An error occurred.")
             e.printStackTrace()
         }
-        compressed_photos.parentFile?.mkdirs()
-        createZipFile(fileList, compressed_photos)
-        val compressed_photos_uri: Uri = FileProvider.getUriForFile(
-            this, "com.example.mdphotos", compressed_photos)
-        sendEmail(compressed_photos_uri, text)
+        compressedPhotos.parentFile?.mkdirs()
+        createZipFile(fileList, compressedPhotos)
+        val compressedPhotosUri: Uri = FileProvider.getUriForFile(
+            this, "com.example.mdphotos", compressedPhotos)
+        sendEmail(compressedPhotosUri, text)
     }
-
 
     private fun createZipFile(files: List<File>, outputZipFile: File): File {
         ZipOutputStream(FileOutputStream(outputZipFile)).use { zipOut ->
@@ -323,7 +322,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val date = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
                 .format(System.currentTimeMillis())
-            val subject = "fotos"
+            val subject = "Fotos"
             val emailIntent = Intent(Intent.ACTION_SEND)
             emailIntent.type = "plain/text"
             emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
@@ -336,12 +335,14 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Request failed try again: $t", Toast.LENGTH_LONG).show()
         }
     }
+
     override fun onPause() {
         super.onPause()
-        val editor = sharedPreferences.edit()
-        editor.putString(KEY_INPUT_TEXT, inputField.text.toString())
-        editor.apply()
+        sharedPreferences.edit {
+            putString(emailInput, inputField.text.toString())
+        }
     }
+
     private fun clearAppCache(context: Context) {
         try {
             val cacheDir = context.cacheDir
