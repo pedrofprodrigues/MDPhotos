@@ -216,7 +216,7 @@ class MainActivity : AppCompatActivity() {
             val preview = Preview.Builder()
                 .build()
                 .also {
-                    it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+                    it.surfaceProvider = viewBinding.viewFinder.surfaceProvider
                 }
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             try {
